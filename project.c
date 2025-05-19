@@ -13,9 +13,7 @@ void print_menu() {
     printf("7. Search text\n");
     printf("0. Exit\n");
 }
-void clear_console() {
-    system("cls");
-}
+
 int get_position(char* text, int line, int index) {
     int current_line = 0, position = 0;
     if (line < 0 || index < 0) return -1;
@@ -30,30 +28,28 @@ int get_position(char* text, int line, int index) {
             position = 0;
         }
     }
-    return -1; 
+    return -1;
 }
+
 int main() {
     char* text = (char*)malloc(1 * sizeof(char));
     text[0] = '\0';
     int capacity = 1;
-    
 
     while (1) {
-        if (clear_enabled) {
-            clear_console();
-        }
         print_menu();
         int command;
         scanf("%d", &command);
-        getchar(); 
+        getchar();
 
         if (command == 0) {
             break;
         }
 
         switch (command) {
-        case 1: { 
-            char buffer[1000];
+        case 1:
+        {
+            char buffer[100];
             printf("Enter your text: ");
             fgets(buffer, 1000, stdin);
             buffer[strcspn(buffer, "\n")] = '\0';
@@ -71,9 +67,11 @@ int main() {
             }
             strcat(text, buffer);
             printf("Text appended: %s\n", text);
-            break;
         }
-        case 2: { 
+        break;
+
+        case 2:
+        {
             int len = strlen(text);
             if (len + 2 > capacity) {
                 capacity = (len + 2) * 2;
@@ -87,9 +85,11 @@ int main() {
             }
             strcat(text, "\n");
             printf("You started a new line\n");
-            break;
         }
-        case 3: 
+        break;
+
+        case 3:
+        {
             char filename[100];
             printf("Enter the file name: ");
             fgets(filename, 100, stdin);
@@ -101,11 +101,13 @@ int main() {
                 printf("Text saved to %s\n", filename);
             }
             else {
-                printf("Error opening file\n");
+                printf("Error with opening file\n");
             }
-            break;
         }
-        case 4: {
+        break;
+
+        case 4:
+        {
             char filename[100];
             printf("Enter the file name: ");
             fgets(filename, 100, stdin);
@@ -137,20 +139,29 @@ int main() {
                 }
                 text[file_size] = '\0';
                 fclose(file);
-                printf("Text has been loaded successfully\n");
+                printf("Text loaded \n");
+            }
+        }
+        break;
+
+        case 5:
+            if (text[0] == '\0') {
+                printf("(Empty line)\n");
+            }
+            else {
+                printf("%s\n", text);
             }
             break;
-        }
-        case 5: { 
-        }
-        case 6: { 
+
+        case 6:
+        {
             int line, index;
             printf("Choose line and index: ");
             scanf("%d %d", &line, &index);
             getchar();
             int position = get_position(text, line, index);
             if (position == -1) {
-                printf("Invalid line or index\n");
+                printf("Invalid data\n");
                 break;
             }
             char buffer[100];
@@ -176,7 +187,49 @@ int main() {
                 text[position + i] = buffer[i];
             }
             printf("Text added successfully\n");
+        }
+        break;
+
+        case 7:
+        {
+            char buffer[30];
+            printf("Enter text to search: ");
+            fgets(buffer, 30, stdin);
+            buffer[strcspn(buffer, "\n")] = '\0';
+            if (buffer[0] == '\0') {
+                printf("Empty search string\n");
+                break;
+            }
+            int line = 1, col = 0;
+            int found = 0;
+            for (int i = 0; text[i] != '\0'; i++) {
+                if (text[i] == '\n') {
+                    line++;
+                    col = 0;
+                    continue;
+                }
+                int j = 0;
+                while (buffer[j] != '\0' && text[i + j] != '\0' && text[i + j] == buffer[j]) {
+                    j++;
+                }
+                if (buffer[j] == '\0') {
+                    printf("Found \"%s\" at line %d, column %d\n", buffer, line, col);
+                    found = 1;
+                }
+                col++;
+            }
+            if (!found) {
+                printf("Text \"%s\" not found\n", buffer);
+            }
+        }
+        break;
+
+        default:
+            printf("Invalid command\n");
             break;
         }
-        case 7: {
-        }
+    }
+
+    free(text);
+    return 0;
+}
